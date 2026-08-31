@@ -1,0 +1,7 @@
+﻿bin/
+obj/
+*.user
+*.suo
+.vs/
+Program_backup.cs
+make_commits.ps1
