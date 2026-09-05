@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MesaDePartes
 {
@@ -32,6 +33,32 @@ namespace MesaDePartes
                    $"DNI/RUC       : {DniRuc}\n" +
                    $"Tipo Doc.     : {TipoDocumento}\n" +
                    $"Ãrea Destino  : {AreaDestino}";
+        }
+    }
+
+    // ===============================================================
+    // LÃ“GICA DE NEGOCIO: EXPEDIENTE MANAGER
+    // ===============================================================
+    public class ExpedienteManager
+    {
+        private List<Expediente> listaExpedientes;
+        private int contadorCorrelativo;
+
+        public ExpedienteManager()
+        {
+            listaExpedientes = new List<Expediente>();
+            contadorCorrelativo = 1;
+        }
+
+        public Expediente Registrar(string remitente, string dniRuc, string tipoDocumento, string areaDestino)
+        {
+            string numeroExpediente = $"EXP-{contadorCorrelativo:D4}";
+            contadorCorrelativo++;
+
+            Expediente nuevo = new Expediente(numeroExpediente, remitente, dniRuc, tipoDocumento, areaDestino);
+            listaExpedientes.Add(nuevo);
+
+            return nuevo;
         }
     }
 
