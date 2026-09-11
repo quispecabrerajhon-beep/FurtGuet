@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MesaDePartes
 {
@@ -48,6 +49,25 @@ namespace MesaDePartes
         {
             listaExpedientes = new List<Expediente>();
             contadorCorrelativo = 1;
+        }
+
+        public bool ValidarDatos(string remitente, string dniRuc, out string error)
+        {
+            error = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(remitente))
+            {
+                error = "El nombre del remitente no puede estar vacÃ­o.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(dniRuc) || (dniRuc.Length != 8 && dniRuc.Length != 11) || !dniRuc.All(char.IsDigit))
+            {
+                error = "El DNI/RUC debe ser numÃ©rico y tener exactamente 8 dÃ­gitos (DNI) o 11 dÃ­gitos (RUC).";
+                return false;
+            }
+
+            return true;
         }
 
         public Expediente Registrar(string remitente, string dniRuc, string tipoDocumento, string areaDestino)
