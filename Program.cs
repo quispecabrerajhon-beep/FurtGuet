@@ -45,13 +45,19 @@ namespace MesaDePartes
         private List<Expediente> listaExpedientes;
         private int contadorCorrelativo;
 
+        private readonly string[] tiposDocumentoValidos = { "SOLICITUD", "SERVICIO", "VENTA", "CONTRATO" };
+        private readonly string[] areasValidas = { "Sistemas", "Administracion", "Logistica", "RRHH" };
+
         public ExpedienteManager()
         {
             listaExpedientes = new List<Expediente>();
             contadorCorrelativo = 1;
         }
 
-        public bool ValidarDatos(string remitente, string dniRuc, out string error)
+        public string[] ObtenerTiposDocumentoValidos() => tiposDocumentoValidos;
+        public string[] ObtenerAreasValidas() => areasValidas;
+
+        public bool ValidarDatos(string remitente, string dniRuc, string tipoDocumento, string areaDestino, out string error)
         {
             error = string.Empty;
 
@@ -64,6 +70,18 @@ namespace MesaDePartes
             if (string.IsNullOrWhiteSpace(dniRuc) || (dniRuc.Length != 8 && dniRuc.Length != 11) || !dniRuc.All(char.IsDigit))
             {
                 error = "El DNI/RUC debe ser numÃ©rico y tener exactamente 8 dÃ­gitos (DNI) o 11 dÃ­gitos (RUC).";
+                return false;
+            }
+
+            if (!tiposDocumentoValidos.Any(t => t.Equals(tipoDocumento, StringComparison.OrdinalIgnoreCase)))
+            {
+                error = $"El tipo de documento debe ser uno de los permitidos: {string.Join(", ", tiposDocumentoValidos)}.";
+                return false;
+            }
+
+            if (!areasValidas.Any(a => a.Equals(areaDestino, StringComparison.OrdinalIgnoreCase)))
+            {
+                error = $"El Ã¡rea destino debe ser una de las permitidas: {string.Join(", ", areasValidas)}.";
                 return false;
             }
 
