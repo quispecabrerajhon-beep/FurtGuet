@@ -98,6 +98,17 @@ namespace MesaDePartes
 
             return nuevo;
         }
+
+        public List<Expediente> Buscar(string criterio)
+        {
+            if (string.IsNullOrWhiteSpace(criterio))
+                return new List<Expediente>();
+
+            return listaExpedientes.Where(e =>
+                e.NumeroExpediente.Equals(criterio, StringComparison.OrdinalIgnoreCase) ||
+                e.DniRuc.Equals(criterio, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
     }
 
     class Program
