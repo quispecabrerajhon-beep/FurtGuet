@@ -109,6 +109,19 @@ namespace MesaDePartes
                 e.DniRuc.Equals(criterio, StringComparison.OrdinalIgnoreCase)
             ).ToList();
         }
+
+        public List<Expediente> ListarTodos()
+        {
+            return listaExpedientes.OrderBy(e => e.FechaRegistro).ToList();
+        }
+
+        public List<Expediente> ListarPorArea(string area)
+        {
+            return listaExpedientes
+                .Where(e => e.AreaDestino.Equals(area, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(e => e.FechaRegistro)
+                .ToList();
+        }
     }
 
     class Program
