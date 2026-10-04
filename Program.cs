@@ -124,14 +124,102 @@ namespace MesaDePartes
         }
     }
 
+    // ===============================================================
+    // INTERFAZ DE USUARIO: PROGRAM
+    // ===============================================================
     class Program
     {
+        static ExpedienteManager manager = new ExpedienteManager();
+
         static void Main(string[] args)
+        {
+            bool salir = false;
+
+            while (!salir)
+            {
+                MostrarMenu();
+                string opcion = Console.ReadLine()?.Trim();
+
+                switch (opcion)
+                {
+                    case "1":
+                        Console.WriteLine("\n[Modulo en desarrollo]");
+                        break;
+                    case "2":
+                        OpcionBuscar();
+                        break;
+                    case "3":
+                        OpcionListar();
+                        break;
+                    case "4":
+                        salir = true;
+                        Console.WriteLine("\nSaliendo del sistema. Â¡Hasta pronto!");
+                        break;
+                    default:
+                        Console.WriteLine("\nOpciÃ³n no vÃ¡lida. Intente nuevamente.\n");
+                        break;
+                }
+            }
+        }
+
+        static void MostrarMenu()
         {
             Console.WriteLine("==========================================");
             Console.WriteLine("        SISTEMA DE MESA DE PARTES        ");
             Console.WriteLine("==========================================");
-            Console.WriteLine("Iniciando sistema...");
+            Console.WriteLine("1. Registrar documento");
+            Console.WriteLine("2. Buscar documento");
+            Console.WriteLine("3. Listar documentos por Ã¡rea");
+            Console.WriteLine("4. Salir");
+            Console.Write("Elija una opciÃ³n: ");
+        }
+
+        static void OpcionBuscar()
+        {
+            Console.WriteLine("\n--- BUSCAR DOCUMENTO ---");
+            Console.Write("Ingrese NÂ° de expediente o DNI/RUC: ");
+            string criterio = Console.ReadLine()?.Trim();
+
+            var resultados = manager.Buscar(criterio);
+
+            if (resultados.Count > 0)
+            {
+                Console.WriteLine($"\nSe encontraron {resultados.Count} resultado(s):\n");
+                foreach (var exp in resultados)
+                {
+                    Console.WriteLine(exp.ToString());
+                    Console.WriteLine("-----------------------------------------");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\n[No encontrado] No existe ningÃºn documento con ese criterio.\n");
+            }
+        }
+
+        static void OpcionListar()
+        {
+            Console.WriteLine("\n--- LISTAR DOCUMENTOS ---");
+            Console.WriteLine($"Ãreas disponibles: {string.Join(" / ", manager.ObtenerAreasValidas())}");
+            Console.Write("Ingrese el Ã¡rea destino a filtrar (vacÃ­o = todas): ");
+            string area = Console.ReadLine()?.Trim();
+
+            var lista = string.IsNullOrWhiteSpace(area)
+                ? manager.ListarTodos()
+                : manager.ListarPorArea(area);
+
+            if (lista.Count == 0)
+            {
+                Console.WriteLine("\nNo hay registros para mostrar.\n");
+                return;
+            }
+
+            Console.WriteLine($"\n{lista.Count} registro(s) ordenado(s) por fecha:\n");
+            foreach (var exp in lista)
+            {
+                Console.WriteLine(exp.ToString());
+                Console.WriteLine("-----------------------------------------");
+            }
         }
     }
 }
