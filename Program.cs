@@ -143,7 +143,7 @@ namespace MesaDePartes
                 switch (opcion)
                 {
                     case "1":
-                        Console.WriteLine("\n[Modulo en desarrollo]");
+                        OpcionRegistrar();
                         break;
                     case "2":
                         OpcionBuscar();
@@ -172,6 +172,42 @@ namespace MesaDePartes
             Console.WriteLine("3. Listar documentos por Ã¡rea");
             Console.WriteLine("4. Salir");
             Console.Write("Elija una opciÃ³n: ");
+        }
+
+        static void OpcionRegistrar()
+        {
+            Console.WriteLine("\n--- REGISTRAR NUEVO DOCUMENTO ---");
+            bool datosValidos = false;
+
+            string remitente = "", dniRuc = "", tipoDocumento = "", areaDestino = "";
+
+            while (!datosValidos)
+            {
+                Console.Write("Remitente: ");
+                remitente = Console.ReadLine()?.Trim();
+
+                Console.Write("DNI (8 dÃ­gitos) o RUC (11 dÃ­gitos): ");
+                dniRuc = Console.ReadLine()?.Trim();
+
+                Console.Write($"Tipo de documento ({string.Join(" / ", manager.ObtenerTiposDocumentoValidos())}): ");
+                tipoDocumento = Console.ReadLine()?.Trim();
+
+                Console.Write($"Ãrea destino ({string.Join(" / ", manager.ObtenerAreasValidas())}): ");
+                areaDestino = Console.ReadLine()?.Trim();
+
+                if (manager.ValidarDatos(remitente, dniRuc, tipoDocumento, areaDestino, out string error))
+                {
+                    datosValidos = true;
+                }
+                else
+                {
+                    Console.WriteLine($"\n[ERROR] {error}");
+                    Console.WriteLine("Por favor, ingrese los datos nuevamente.\n");
+                }
+            }
+
+            Expediente nuevoExpediente = manager.Registrar(remitente, dniRuc, tipoDocumento, areaDestino);
+            Console.WriteLine($"\nDocumento registrado con Ã©xito: {nuevoExpediente.NumeroExpediente}\n");
         }
 
         static void OpcionBuscar()
