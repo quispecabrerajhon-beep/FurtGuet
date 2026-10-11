@@ -207,7 +207,14 @@ namespace MesaDePartes
             }
 
             Expediente nuevoExpediente = manager.Registrar(remitente, dniRuc, tipoDocumento, areaDestino);
-            Console.WriteLine($"\nDocumento registrado con Ã©xito: {nuevoExpediente.NumeroExpediente}\n");
+            EmitirCargo(nuevoExpediente);
+        }
+
+        static void EmitirCargo(Expediente expediente)
+        {
+            Console.WriteLine("\n========= CARGO / COMPROBANTE =========");
+            Console.WriteLine(expediente.ToString());
+            Console.WriteLine("=========================================\n");
         }
 
         static void OpcionBuscar()
