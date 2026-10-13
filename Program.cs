@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,31 +14,34 @@ namespace MesaDePartes
         public string DniRuc { get; set; }
         public string TipoDocumento { get; set; }
         public string AreaDestino { get; set; }
+        public string Detalle { get; set; } // NUEVO: Descripción o detalles del documento (repuestos, montos, etc.)
         public DateTime FechaRegistro { get; set; }
 
-        public Expediente(string numeroExpediente, string remitente, string dniRuc, string tipoDocumento, string areaDestino)
+        public Expediente(string numeroExpediente, string remitente, string dniRuc, string tipoDocumento, string areaDestino, string detalle)
         {
             NumeroExpediente = numeroExpediente;
             Remitente = remitente;
             DniRuc = dniRuc;
             TipoDocumento = tipoDocumento;
             AreaDestino = areaDestino;
+            Detalle = detalle;
             FechaRegistro = DateTime.Now;
         }
 
         public override string ToString()
         {
-            return $"NÂ° Expediente : {NumeroExpediente}\n" +
+            return $"N° Expediente : {NumeroExpediente}\n" +
                    $"Fecha y Hora  : {FechaRegistro:dd/MM/yyyy HH:mm:ss}\n" +
                    $"Remitente     : {Remitente}\n" +
                    $"DNI/RUC       : {DniRuc}\n" +
                    $"Tipo Doc.     : {TipoDocumento}\n" +
-                   $"Ãrea Destino  : {AreaDestino}";
+                   $"Área Destino  : {AreaDestino}\n" +
+                   $"Detalle/Asunto: {Detalle}"; // Se incluye el detalle en la visualización
         }
     }
 
     // ===============================================================
-    // LÃ“GICA DE NEGOCIO: EXPEDIENTE MANAGER
+    // LÓGICA DE NEGOCIO: EXPEDIENTE MANAGER
     // ===============================================================
     public class ExpedienteManager
     {
@@ -57,19 +60,19 @@ namespace MesaDePartes
         public string[] ObtenerTiposDocumentoValidos() => tiposDocumentoValidos;
         public string[] ObtenerAreasValidas() => areasValidas;
 
-        public bool ValidarDatos(string remitente, string dniRuc, string tipoDocumento, string areaDestino, out string error)
+        public bool ValidarDatos(string remitente, string dniRuc, string tipoDocumento, string areaDestino, string detalle, out string error)
         {
             error = string.Empty;
 
             if (string.IsNullOrWhiteSpace(remitente))
             {
-                error = "El nombre del remitente no puede estar vacÃ­o.";
+                error = "El nombre del remitente no puede estar vacío.";
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(dniRuc) || (dniRuc.Length != 8 && dniRuc.Length != 11) || !dniRuc.All(char.IsDigit))
             {
-                error = "El DNI/RUC debe ser numÃ©rico y tener exactamente 8 dÃ­gitos (DNI) o 11 dÃ­gitos (RUC).";
+                error = "El DNI/RUC debe ser numérico y tener exactamente 8 dígitos (DNI) o 11 dígitos (RUC).";
                 return false;
             }
 
@@ -81,19 +84,25 @@ namespace MesaDePartes
 
             if (!areasValidas.Any(a => a.Equals(areaDestino, StringComparison.OrdinalIgnoreCase)))
             {
-                error = $"El Ã¡rea destino debe ser una de las permitidas: {string.Join(", ", areasValidas)}.";
+                error = $"El área destino debe ser una de las permitidas: {string.Join(", ", areasValidas)}.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(detalle))
+            {
+                error = "El detalle o descripción del documento no puede estar vacío.";
                 return false;
             }
 
             return true;
         }
 
-        public Expediente Registrar(string remitente, string dniRuc, string tipoDocumento, string areaDestino)
+        public Expediente Registrar(string remitente, string dniRuc, string tipoDocumento, string areaDestino, string detalle)
         {
             string numeroExpediente = $"EXP-{contadorCorrelativo:D4}";
             contadorCorrelativo++;
 
-            Expediente nuevo = new Expediente(numeroExpediente, remitente, dniRuc, tipoDocumento, areaDestino);
+            Expediente nuevo = new Expediente(numeroExpediente, remitente, dniRuc, tipoDocumento, areaDestino, detalle);
             listaExpedientes.Add(nuevo);
 
             return nuevo;
@@ -153,10 +162,10 @@ namespace MesaDePartes
                         break;
                     case "4":
                         salir = true;
-                        Console.WriteLine("\nSaliendo del sistema. Â¡Hasta pronto!");
+                        Console.WriteLine("\nSaliendo del sistema. ¡Hasta pronto!");
                         break;
                     default:
-                        Console.WriteLine("\nOpciÃ³n no vÃ¡lida. Intente nuevamente.\n");
+                        Console.WriteLine("\nOpción no válida. Intente nuevamente.\n");
                         break;
                 }
             }
@@ -169,9 +178,9 @@ namespace MesaDePartes
             Console.WriteLine("==========================================");
             Console.WriteLine("1. Registrar documento");
             Console.WriteLine("2. Buscar documento");
-            Console.WriteLine("3. Listar documentos por Ã¡rea");
+            Console.WriteLine("3. Listar documentos por área");
             Console.WriteLine("4. Salir");
-            Console.Write("Elija una opciÃ³n: ");
+            Console.Write("Elija una opción: ");
         }
 
         static void OpcionRegistrar()
@@ -179,23 +188,27 @@ namespace MesaDePartes
             Console.WriteLine("\n--- REGISTRAR NUEVO DOCUMENTO ---");
             bool datosValidos = false;
 
-            string remitente = "", dniRuc = "", tipoDocumento = "", areaDestino = "";
+            string remitente = "", dniRuc = "", tipoDocumento = "", areaDestino = "", detalle = "";
 
             while (!datosValidos)
             {
                 Console.Write("Remitente: ");
                 remitente = Console.ReadLine()?.Trim();
 
-                Console.Write("DNI (8 dÃ­gitos) o RUC (11 dÃ­gitos): ");
+                Console.Write("DNI (8 dígitos) o RUC (11 dígitos): ");
                 dniRuc = Console.ReadLine()?.Trim();
 
                 Console.Write($"Tipo de documento ({string.Join(" / ", manager.ObtenerTiposDocumentoValidos())}): ");
                 tipoDocumento = Console.ReadLine()?.Trim();
 
-                Console.Write($"Ãrea destino ({string.Join(" / ", manager.ObtenerAreasValidas())}): ");
+                Console.Write($"Área destino ({string.Join(" / ", manager.ObtenerAreasValidas())}): ");
                 areaDestino = Console.ReadLine()?.Trim();
 
-                if (manager.ValidarDatos(remitente, dniRuc, tipoDocumento, areaDestino, out string error))
+                // NUEVO: Solicitud de los detalles de la compra, servicio, venta o contrato
+                Console.Write("Detalle / Descripción: ");
+                detalle = Console.ReadLine()?.Trim();
+
+                if (manager.ValidarDatos(remitente, dniRuc, tipoDocumento, areaDestino, detalle, out string error))
                 {
                     datosValidos = true;
                 }
@@ -206,7 +219,7 @@ namespace MesaDePartes
                 }
             }
 
-            Expediente nuevoExpediente = manager.Registrar(remitente, dniRuc, tipoDocumento, areaDestino);
+            Expediente nuevoExpediente = manager.Registrar(remitente, dniRuc, tipoDocumento, areaDestino, detalle);
             EmitirCargo(nuevoExpediente);
         }
 
@@ -220,7 +233,7 @@ namespace MesaDePartes
         static void OpcionBuscar()
         {
             Console.WriteLine("\n--- BUSCAR DOCUMENTO ---");
-            Console.Write("Ingrese NÂ° de expediente o DNI/RUC: ");
+            Console.Write("Ingrese N° de expediente o DNI/RUC: ");
             string criterio = Console.ReadLine()?.Trim();
 
             var resultados = manager.Buscar(criterio);
@@ -236,15 +249,15 @@ namespace MesaDePartes
             }
             else
             {
-                Console.WriteLine("\n[No encontrado] No existe ningÃºn documento con ese criterio.\n");
+                Console.WriteLine("\n[No encontrado] No existe ningún documento con ese criterio.\n");
             }
         }
 
         static void OpcionListar()
         {
             Console.WriteLine("\n--- LISTAR DOCUMENTOS ---");
-            Console.WriteLine($"Ãreas disponibles: {string.Join(" / ", manager.ObtenerAreasValidas())}");
-            Console.Write("Ingrese el Ã¡rea destino a filtrar (vacÃ­o = todas): ");
+            Console.WriteLine($"Áreas disponibles: {string.Join(" / ", manager.ObtenerAreasValidas())}");
+            Console.Write("Ingrese el área destino a filtrar (vacío = todas): ");
             string area = Console.ReadLine()?.Trim();
 
             var lista = string.IsNullOrWhiteSpace(area)
