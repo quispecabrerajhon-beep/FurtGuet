@@ -26,3 +26,8 @@ dotnet build
 # Ejecutar la aplicación
 dotnet run
 ```
+
+## Estado del Proyecto
+- Compilación: OK (0 errores).
+- Validación de datos: Conforme.
+- Pruebas de integración superadas exitosamente.
